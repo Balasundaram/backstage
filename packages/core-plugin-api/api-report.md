@@ -258,6 +258,7 @@ export type BackstagePlugin<
   getId(): string;
   output(): PluginOutput[];
   getApis(): Iterable<AnyApiFactory>;
+  getFeatureFlags(): Iterable<PluginFeatureFlagConfig>;
   provide<T>(extension: Extension<T>): T;
   routes: Routes;
   externalRoutes: ExternalRoutes;
@@ -404,21 +405,29 @@ export interface ElementCollection {
   }): ElementCollection;
 }
 
-// @public
-type Error_2 = {
-  name: string;
-  message: string;
-  stack?: string;
-};
+// @public @deprecated (undocumented)
+type Error_2 = ErrorApiError;
 export { Error_2 as Error };
 
 // @public
 export type ErrorApi = {
-  post(error: Error_2, context?: ErrorContext): void;
+  post(error: ErrorApiError, context?: ErrorApiErrorContext): void;
   error$(): Observable_2<{
-    error: Error_2;
-    context?: ErrorContext;
+    error: ErrorApiError;
+    context?: ErrorApiErrorContext;
   }>;
+};
+
+// @public
+export type ErrorApiError = {
+  name: string;
+  message: string;
+  stack?: string;
+};
+
+// @public
+export type ErrorApiErrorContext = {
+  hidden?: boolean;
 };
 
 // @public
@@ -431,10 +440,8 @@ export type ErrorBoundaryFallbackProps = {
   resetError: () => void;
 };
 
-// @public
-export type ErrorContext = {
-  hidden?: boolean;
-};
+// @public @deprecated (undocumented)
+export type ErrorContext = ErrorApiErrorContext;
 
 // @public
 export type Extension<T> = {
@@ -457,7 +464,7 @@ export type FeatureFlag = {
   pluginId: string;
 };
 
-// @public
+// @public @deprecated
 export type FeatureFlagOutput = {
   type: 'feature-flag';
   name: string;
@@ -676,14 +683,20 @@ export type PluginConfig<
   register?(hooks: PluginHooks): void;
   routes?: Routes;
   externalRoutes?: ExternalRoutes;
+  featureFlags?: PluginFeatureFlagConfig[];
 };
 
 // @public
+export type PluginFeatureFlagConfig = {
+  name: string;
+};
+
+// @public @deprecated
 export type PluginHooks = {
   featureFlags: FeatureFlagsHooks;
 };
 
-// @public
+// @public @deprecated
 export type PluginOutput = FeatureFlagOutput;
 
 // @public
@@ -702,14 +715,6 @@ export type ProfileInfoApi = {
 export type RouteFunc<Params extends AnyParams> = (
   ...[params]: Params extends undefined ? readonly [] : readonly [Params]
 ) => string;
-
-// @public
-export type RouteOptions = {
-  exact?: boolean;
-};
-
-// @public
-export type RoutePath = string;
 
 // @public
 export type RouteRef<Params extends AnyParams = any> = {
